@@ -216,7 +216,7 @@ public class BookAppIntegrationTest {
 		driver.get(BASE_URL + "/info?bookId=3109");
 
 		// Assert
-		wait.until(ExpectedConditions.textToBePresentInElementLocated(By.tagName("body"), "Info Book"));
+//		wait.until(ExpectedConditions.textToBePresentInElementLocated(By.tagName("body"), "Info Book"));
 		assertTrue(driver.getPageSource().contains("Info Book"));
 	}
 
