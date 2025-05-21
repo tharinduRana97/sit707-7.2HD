@@ -10,11 +10,7 @@ steps:
         echo "Waiting for services to start..."
         sleep 15
         echo "Running tests..."
-        docker exec book-test-runner mvn -Dmaven.repo.local=/cache/.m2 test
-
-volumes:
-  - name: 'm2-cache'
-    path: /cache/.m2
+        docker exec book-test-runner mvn -Dmaven.repo.local=/workspace/.m2 test
 
 artifacts:
   objects:
@@ -23,3 +19,7 @@ artifacts:
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
+cache:
+  paths:
+    - '.m2/repository'
