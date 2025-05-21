@@ -1,8 +1,10 @@
 FROM selenium/standalone-chrome:121.0
 
-# Optional: Add your test code
-WORKDIR /usr/src/app
-COPY . .
+USER root
+WORKDIR /app
 
-# You don't need to install chrome/chromedriver manually here
-# Maven will be used to run tests
+# Install Maven
+RUN apt-get update && apt-get install -y maven
+
+# Copy your project files
+COPY . .
