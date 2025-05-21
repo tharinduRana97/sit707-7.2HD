@@ -1,0 +1,28 @@
+steps:
+  # Step 1: Clean and compile the project
+  - name: 'gcr.io/cloud-builders/mvn'
+    id: 'Clean and Build'
+    args: ['clean', 'compile']
+
+  # Step 2: Run tests (expect failures in early runs)
+  - name: 'gcr.io/cloud-builders/mvn'
+    id: 'Run Tests'
+    args: ['test']
+
+  # Step 3: Package the application
+  - name: 'gcr.io/cloud-builders/mvn'
+    id: 'Package App'
+    args: ['package']
+
+  # Optional: Deploy to App Engine or Cloud Run
+  # If deploying to App Engine:
+  # - name: 'gcr.io/cloud-builders/gcloud'
+  #   id: 'Deploy to App Engine'
+  #   args: ['app', 'deploy']
+  #   dir: 'path/to/your-app-engine-config'
+
+artifacts:
+  # Optionally store build artifacts
+  objects:
+    location: 'gs://your-bucket-name/build-artifacts/'
+    paths: ['target/*.jar']
