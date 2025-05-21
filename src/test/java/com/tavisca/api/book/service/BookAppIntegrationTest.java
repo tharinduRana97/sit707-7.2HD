@@ -2,7 +2,6 @@ package com.tavisca.api.book.service;
 
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.*;
 import org.openqa.selenium.support.ui.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -22,23 +21,14 @@ public class BookAppIntegrationTest {
 	private static final String BASE_URL = "http://localhost:8080";
 
 	@BeforeEach
-	public void setUp() {
-		try {
-			ChromeOptions options = new ChromeOptions();
-			options.addArguments("--headless=new");
-			options.addArguments("--no-sandbox");
-			options.addArguments("--disable-dev-shm-usage");
+	public void setUp() throws MalformedURLException {
+	    ChromeOptions options = new ChromeOptions();
+	    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
 
-			// Connect to remote WebDriver (Docker container exposing Selenium on port 4444)
-			driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
-
-			wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
-			System.out.println("Remote WebDriver initialized successfully.");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+	    driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
+	    wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 	}
+
 
 
 	@AfterEach

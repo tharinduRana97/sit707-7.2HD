@@ -9,17 +9,17 @@ steps:
     args:
       - '-c'
       - |
-        Xvfb :99 & sleep 2 && mvn clean test
+        sleep 5  # let selenium server start
+        mvn clean test
 
   - name: 'gcr.io/$PROJECT_ID/book-test-image'
     id: 'Package App'
     args: ['mvn', 'package']
 
-options:
-  logging: CLOUD_LOGGING_ONLY
 artifacts:
   objects:
     location: 'gs://s224169428/sit707/'
     paths: ['target/*.jar']
 
-    
+options:
+  logging: CLOUD_LOGGING_ONLY
