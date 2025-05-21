@@ -20,6 +20,8 @@ steps:
   #   id: 'Deploy to App Engine'
   #   args: ['app', 'deploy']
   #   dir: 'path/to/your-app-engine-config'
+options:
+  logging: CLOUD_LOGGING_ONLY
 
 artifacts:
   # Optionally store build artifacts
