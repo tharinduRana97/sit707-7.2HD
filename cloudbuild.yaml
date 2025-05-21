@@ -1,5 +1,5 @@
 steps:
-  # Step 0: Install Chrome and matching ChromeDriver
+  # Step 0: Install Chrome and matching ChromeDriver from official source
   - name: 'ubuntu'
     id: 'Install Chrome & ChromeDriver'
     entrypoint: 'bash'
@@ -13,30 +13,31 @@ steps:
         libu2f-udev libvulkan1 libxcomposite1 libxdamage1 libxfixes3 \
         libxkbcommon0 libxrandr2 xdg-utils xvfb
 
-        # Install Chrome
-        wget -q -O chrome-linux64.zip https://bit.ly/chrome-linux64-121-0-6167-85
+        # Download and install Chrome for Testing (official build)
+        wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/121.0.6167.85/linux64/chrome-linux64.zip
         unzip chrome-linux64.zip
         rm chrome-linux64.zip
         mv chrome-linux64 /opt/chrome
         ln -s /opt/chrome/chrome /usr/local/bin/google-chrome
 
-        # Install ChromeDriver
-        wget -q -O chromedriver-linux64.zip https://bit.ly/chromedriver-linux64-121-0-6167-85
+        # Download and install matching Chromedriver (official build)
+        wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/121.0.6167.85/linux64/chromedriver-linux64.zip
         unzip -j chromedriver-linux64.zip chromedriver-linux64/chromedriver
         rm chromedriver-linux64.zip
         mv chromedriver /usr/bin/chromedriver
         chmod +x /usr/bin/chromedriver
 
-        # Verify installation
+        # Confirm they are usable
+        file /usr/bin/chromedriver
         google-chrome --version
         chromedriver --version
 
-  # Step 1: Compile
+  # Step 1: Compile the project
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Compile'
     args: ['clean', 'compile']
 
-  # Step 2: Test
+  # Step 2: Run Selenium tests with headless X display
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Run Tests'
     entrypoint: 'bash'
@@ -47,7 +48,7 @@ steps:
         echo "Running tests with DISPLAY=$$DISPLAY"
         mvn test
 
-  # Step 3: Package
+  # Step 3: Package the application
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Package App'
     args: ['package']
