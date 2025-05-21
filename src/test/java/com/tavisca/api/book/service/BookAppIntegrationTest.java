@@ -20,9 +20,12 @@ public class BookAppIntegrationTest {
     public void setUp() {
     	System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
         ChromeOptions options = new ChromeOptions();
+        options.setBinary("/usr/local/bin/google-chrome");
         options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        System.out.println("CHROMEDRIVER PATH = " + System.getProperty("webdriver.chrome.driver"));
+
     }
 
     @AfterEach
