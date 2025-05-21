@@ -1,7 +1,7 @@
 steps:
   # Step 0: Install Chrome + ChromeDriver + Xvfb
   - name: 'ubuntu'
-    id: 'Install Chrome & ChromeDriver'
+    id: 'Install Chrome & Matching ChromeDriver'
     entrypoint: 'bash'
     args:
       - '-c'
@@ -11,7 +11,11 @@ steps:
         && echo "deb [signed-by=/usr/share/keyrings/google-linux.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
         && apt-get update && apt-get install -y google-chrome-stable \
         && wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/136.0.7103.113/linux64/chromedriver-linux64.zip \
-        && unzip chromedriver-linux64.zip && mv chromedriver-linux64/chromedriver /usr/bin/chromedriver && chmod +x /usr/bin/chromedriver
+        && unzip chromedriver-linux64.zip \
+        && mv chromedriver-linux64/chromedriver /usr/bin/chromedriver \
+        && chmod +x /usr/bin/chromedriver \
+        && chromedriver --version
+
 
 
 
