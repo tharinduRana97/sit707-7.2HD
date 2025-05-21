@@ -14,8 +14,10 @@ steps:
         && unzip chromedriver-linux64.zip \
         && mv chromedriver-linux64/chromedriver /usr/bin/chromedriver \
         && chmod +x /usr/bin/chromedriver \
+        && ls -l /usr/bin/chromedriver \
         && chromedriver --version \
         && google-chrome --version
+
 
 
   # Step 1: Clean and compile
