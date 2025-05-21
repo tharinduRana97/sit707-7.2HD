@@ -31,9 +31,9 @@ steps:
         ldd /usr/bin/chromedriver || echo "ldd failed"
         chromedriver --version
 
-  - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Compile'
-    args: ['clean', 'compile']
+  # - name: 'gcr.io/cloud-builders/mvn'
+  #   id: 'Compile'
+  #   args: ['clean', 'compile']
 
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Run Tests'
