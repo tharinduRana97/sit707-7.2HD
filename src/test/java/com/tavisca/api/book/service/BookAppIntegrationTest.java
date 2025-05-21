@@ -21,11 +21,15 @@ public class BookAppIntegrationTest {
 	private static final String BASE_URL = "http://localhost:8080";
 
 	@BeforeEach
-	public void setUp() throws MalformedURLException {
+	public void setUp() {
 	    ChromeOptions options = new ChromeOptions();
 	    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
 
-	    driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
+	    try {
+	        driver = new RemoteWebDriver(new URL("http://selenium-hub:4444/wd/hub"), options);
+	    } catch (MalformedURLException e) {
+	        e.printStackTrace();
+	    }
 	    wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 	}
 

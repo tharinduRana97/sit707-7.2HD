@@ -1,20 +1,13 @@
-steps:
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'Build Test Image'
-    args: ['build', '-f', 'Dockerfile.test', '-t', 'gcr.io/$PROJECT_ID/book-test-image', '.']
+- name: 'docker/compose:1.29.2'
+  args: ['up', '-d']
 
-  - name: 'gcr.io/$PROJECT_ID/book-test-image'
-    id: 'Run Tests'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        sleep 5  # let selenium server start
-        mvn clean test
+- name: 'docker/compose:1.29.2'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      docker exec book-test-runner mvn test
 
-  - name: 'gcr.io/$PROJECT_ID/book-test-image'
-    id: 'Package App'
-    args: ['mvn', 'package']
 
 artifacts:
   objects:
