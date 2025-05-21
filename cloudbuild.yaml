@@ -1,13 +1,15 @@
 steps:
   - name: 'docker/compose:1.29.2'
-    args: ['up', '-d']
-    dir: '.' 
+    args: ['up', '-d']  # Start containers in the background
 
   - name: 'docker/compose:1.29.2'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
+        echo "Waiting for services to start..."
+        sleep 15
+        echo "Running tests..."
         docker exec book-test-runner mvn test
 
 artifacts:
