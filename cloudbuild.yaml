@@ -40,7 +40,7 @@ steps:
       - '-c'
       - |
         Xvfb :99 & export DISPLAY=:99
-        echo "Running tests with DISPLAY=$DISPLAY"
+        echo "Running tests with DISPLAY=$$DISPLAY"
         mvn test
 
   # Step 3: Package the JAR
