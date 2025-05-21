@@ -10,20 +10,23 @@ steps:
   - name: 'docker/compose:1.29.2'
     args: ['up', '-d']
 
-  - name: 'docker/compose:1.29.2'
+  - name: 'docker/compose:1.29.2'  # FIXED INDENTATION
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "Waiting for book-test-runner to be ready..."
+        echo "Waiting for Selenium to be ready..."
         for i in {1..30}; do
-          docker exec book-test-runner curl -s http://localhost:8080/health && break
-          echo "Still waiting... $i"
+          if docker exec book-test-runner curl -s http://selenium:4444/wd/hub/status | grep -q '"ready":true'; then
+            echo "Selenium is ready!"
+            break
+          fi
+          echo "Waiting for Selenium... attempt $i"
           sleep 2
         done
+
         echo "Running tests..."
         docker exec book-test-runner mvn -Dmaven.repo.local=/workspace/.m2 test
-
 
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/maven_cache/']
