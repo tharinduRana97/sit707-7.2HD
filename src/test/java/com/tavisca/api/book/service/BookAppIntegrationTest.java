@@ -26,7 +26,7 @@ public class BookAppIntegrationTest {
 	    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
 
 	    try {
-	        driver = new RemoteWebDriver(new URL("http://selenium-hub:4444/wd/hub"), options);
+	        driver = new RemoteWebDriver(new URL(System.getenv("SELENIUM_REMOTE_URL")), options);
 	    } catch (MalformedURLException e) {
 	        e.printStackTrace();
 	    }

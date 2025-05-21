@@ -1,26 +1,16 @@
 version: "3"
 services:
-  selenium-hub:
-    image: selenium/hub:4.14.0
-    container_name: selenium-hub
+  selenium:
+    image: selenium/standalone-chrome:4.14.1
     ports:
       - "4444:4444"
-
-  chrome:
-    image: selenium/node-chrome:4.14.0-20240423
-    depends_on:
-      - selenium-hub
-    environment:
-      - SE_EVENT_BUS_HOST=selenium-hub
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    shm_size: "2g"
 
   book-test-runner:
     build:
       context: .
       dockerfile: Dockerfile.test
-    container_name: book-test-runner
     depends_on:
-      - selenium-hub
-    networks:
-      - default
+      - selenium
+    environment:
+      - SELENIUM_REMOTE_URL=http://selenium:4444/wd/hub
