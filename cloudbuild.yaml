@@ -33,9 +33,9 @@ steps:
         chromedriver --version
 
   # Step 1: Compile the project
-  - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Compile'
-    args: ['clean', 'compile']
+  # - name: 'gcr.io/cloud-builders/mvn'
+  #   id: 'Compile'
+  #   args: ['clean', 'compile']
 
   # Step 2: Run Selenium tests with headless X display
   - name: 'gcr.io/cloud-builders/mvn'
