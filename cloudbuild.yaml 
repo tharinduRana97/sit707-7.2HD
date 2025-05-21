@@ -26,3 +26,5 @@ artifacts:
   objects:
     location: 'gs://your-bucket-name/build-artifacts/'
     paths: ['target/*.jar']
+
+    
