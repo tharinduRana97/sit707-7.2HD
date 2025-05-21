@@ -1,24 +1,22 @@
 FROM maven:3.9-eclipse-temurin-17
 
-# Install dependencies
 RUN apt-get update && apt-get install -y \
     wget unzip curl gnupg xvfb \
-    libgtk-3-0 libnss3 libxss1 libasound2 libx11-xcb1 libdbus-1-3 \
+    libgtk-3-0 libnss3 libxss1 libasound2t64 libx11-xcb1 libdbus-1-3 \
     libxcomposite1 libxdamage1 libxrandr2 xdg-utils
 
 # Install Chrome
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    dpkg -i google-chrome-stable_current_amd64.deb || apt-get -f install -y && \
-    apt-get install -y -f && rm google-chrome-stable_current_amd64.deb
+RUN wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/121.0.6167.85/linux64/chrome-linux64.zip && \
+    unzip chrome-linux64.zip && \
+    mv chrome-linux64 /opt/chrome && \
+    ln -s /opt/chrome/chrome /usr/bin/google-chrome && \
+    rm chrome-linux64.zip
 
-# Install ChromeDriver matching version
-RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+') && \
-    DRIVER_VERSION=$(curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}) && \
-    wget -q https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && mv chromedriver /usr/bin/chromedriver && \
-    chmod +x /usr/bin/chromedriver && rm chromedriver_linux64.zip
+# Install Chromedriver
+RUN wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/121.0.6167.85/linux64/chromedriver-linux64.zip && \
+    unzip -j chromedriver-linux64.zip chromedriver-linux64/chromedriver && \
+    mv chromedriver /usr/bin/chromedriver && \
+    chmod +x /usr/bin/chromedriver && \
+    rm chromedriver-linux64.zip
 
 ENV DISPLAY=:99
-
-WORKDIR /app
-COPY . /app
