@@ -1,42 +1,51 @@
 steps:
-  # Step 0: Install Google Chrome + exact-matching ChromeDriver
+  # Step 0: Install Google Chrome + ChromeDriver (bit.ly version for 121.0.6167.85)
   - name: 'ubuntu'
     id: 'Install Chrome & ChromeDriver'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        apt-get update && apt-get install -y wget unzip gnupg curl xvfb \
-        && curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-linux.gpg \
-        && echo "deb [signed-by=/usr/share/keyrings/google-linux.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-        && apt-get update && apt-get install -y google-chrome-stable \
-        && wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/136.0.7103.113/linux64/chromedriver-linux64.zip \
-        && unzip chromedriver-linux64.zip \
-        && mv chromedriver-linux64/chromedriver /usr/bin/chromedriver \
-        && chmod +x /usr/bin/chromedriver \
-        && ls -l /usr/bin/chromedriver \
-        && chromedriver --version \
-        && google-chrome --version
+        apt-get update -qq -y
+        apt-get install -y wget unzip fonts-liberation libasound2 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 \
+        libcups2 libdbus-1-3 libdrm2 libgbm1 libgtk-4-1 libnspr4 libnss3 libu2f-udev libvulkan1 libxcomposite1 \
+        libxdamage1 libxfixes3 libxkbcommon0 libxrandr2 xdg-utils xvfb
+        # Chrome
+        wget -q -O chrome-linux64.zip https://bit.ly/chrome-linux64-121-0-6167-85
+        unzip chrome-linux64.zip
+        rm chrome-linux64.zip
+        mv chrome-linux64 /opt/chrome
+        ln -s /opt/chrome/chrome /usr/local/bin/google-chrome
+        # Chromedriver
+        wget -q -O chromedriver-linux64.zip https://bit.ly/chromedriver-linux64-121-0-6167-85
+        unzip -j chromedriver-linux64.zip chromedriver-linux64/chromedriver
+        rm chromedriver-linux64.zip
+        mv chromedriver /usr/bin/chromedriver
+        chmod +x /usr/bin/chromedriver
+        # Confirm installation
+        google-chrome --version
+        chromedriver --version
+        ls -l /usr/bin/chromedriver
 
-
-
-  # Step 1: Clean and compile
+  # Step 1: Compile the project
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Compile'
     args: ['clean', 'compile']
 
-  # Step 2: Run Selenium GUI tests with Xvfb
+  # Step 2: Run tests with Xvfb (headless GUI)
   - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Test'
+    id: 'Run Tests'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        Xvfb :99 & export DISPLAY=:99 && mvn test
+        Xvfb :99 & export DISPLAY=:99
+        echo "Running tests with DISPLAY=$DISPLAY"
+        mvn test
 
-  # Step 3: Package JAR
+  # Step 3: Package the JAR
   - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Package'
+    id: 'Package App'
     args: ['package']
 
 artifacts:
