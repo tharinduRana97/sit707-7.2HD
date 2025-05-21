@@ -1,13 +1,13 @@
-- name: 'docker/compose:1.29.2'
-  args: ['up', '-d']
+steps:
+  - name: 'docker/compose:1.29.2'
+    args: ['up', '-d']
 
-- name: 'docker/compose:1.29.2'
-  entrypoint: 'bash'
-  args:
-    - '-c'
-    - |
-      docker exec book-test-runner mvn test
-
+  - name: 'docker/compose:1.29.2'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        docker exec book-test-runner mvn test
 
 artifacts:
   objects:
