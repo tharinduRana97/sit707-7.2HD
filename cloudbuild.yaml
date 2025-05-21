@@ -1,7 +1,7 @@
 steps:
-  # Step 0: Install Chrome + ChromeDriver + Xvfb
+  # Step 0: Install Google Chrome + exact-matching ChromeDriver
   - name: 'ubuntu'
-    id: 'Install Chrome & Matching ChromeDriver'
+    id: 'Install Chrome & ChromeDriver'
     entrypoint: 'bash'
     args:
       - '-c'
@@ -14,41 +14,32 @@ steps:
         && unzip chromedriver-linux64.zip \
         && mv chromedriver-linux64/chromedriver /usr/bin/chromedriver \
         && chmod +x /usr/bin/chromedriver \
-        && chromedriver --version
-
-
-
+        && chromedriver --version \
+        && google-chrome --version
 
   # Step 1: Clean and compile
   - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Clean and Compile'
+    id: 'Compile'
     args: ['clean', 'compile']
 
-  # Step 2: Run tests with Xvfb + ChromeDriver
+  # Step 2: Run Selenium GUI tests with Xvfb
   - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Run Tests with Selenium'
+    id: 'Test'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         Xvfb :99 & export DISPLAY=:99 && mvn test
 
-  # Step 3: Package the application
+  # Step 3: Package JAR
   - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Package App'
+    id: 'Package'
     args: ['package']
-
-  # Optional: Deploy to App Engine or Cloud Run
-  # If deploying to App Engine:
-  # - name: 'gcr.io/cloud-builders/gcloud'
-  #   id: 'Deploy to App Engine'
-  #   args: ['app', 'deploy']
-  #   dir: 'path/to/your-app-engine-config'
-options:
-  logging: CLOUD_LOGGING_ONLY
 
 artifacts:
   objects:
     location: 'gs://s224169428/sit707/'
     paths: ['target/*.jar']
 
+options:
+  logging: CLOUD_LOGGING_ONLY
