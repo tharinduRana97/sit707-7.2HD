@@ -1,59 +1,21 @@
 steps:
-  - name: 'ubuntu'
-    id: 'Install Chrome & ChromeDriver'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        apt-get update -y && apt-get install -y \
-        wget unzip curl gnupg file xvfb libc-bin \
-        libgtk-3-0 libnss3 libxss1 libasound2t64 libx11-xcb1 libdbus-1-3 \
-        libxcomposite1 libxdamage1 libxrandr2 xdg-utils
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build Test Image'
+    args: ['build', '-f', 'Dockerfile.test', '-t', 'gcr.io/$PROJECT_ID/book-test-image', '.']
 
-        # Install Chrome for Testing
-        wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/121.0.6167.85/linux64/chrome-linux64.zip
-        unzip chrome-linux64.zip
-        rm chrome-linux64.zip
-        mv chrome-linux64 /opt/chrome
-        ln -s /opt/chrome/chrome /usr/bin/google-chrome
-
-        # Install Chromedriver
-        wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/121.0.6167.85/linux64/chromedriver-linux64.zip
-        unzip -j chromedriver-linux64.zip chromedriver-linux64/chromedriver
-        rm chromedriver-linux64.zip
-        mv chromedriver /usr/bin/chromedriver
-        chmod +x /usr/bin/chromedriver
-
-        # Diagnostics
-        echo "== Chrome Version =="
-        google-chrome --version
-        echo "== Chromedriver Info =="
-        file /usr/bin/chromedriver
-        ldd /usr/bin/chromedriver || echo "ldd failed"
-        chromedriver --version
-
-  # - name: 'gcr.io/cloud-builders/mvn'
-  #   id: 'Compile'
-  #   args: ['clean', 'compile']
-
-  - name: 'gcr.io/cloud-builders/mvn'
+  - name: 'gcr.io/$PROJECT_ID/book-test-image'
     id: 'Run Tests'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        Xvfb :99 & export DISPLAY=:99
-        echo "Running tests in headless mode with DISPLAY=$$DISPLAY"
-        mvn test
+        Xvfb :99 & sleep 2 && mvn clean test
 
-  - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Package'
-    args: ['package']
+  - name: 'gcr.io/$PROJECT_ID/book-test-image'
+    id: 'Package App'
+    args: ['mvn', 'package']
 
 artifacts:
   objects:
     location: 'gs://s224169428/sit707/'
     paths: ['target/*.jar']
-
-options:
-  logging: CLOUD_LOGGING_ONLY
