@@ -7,9 +7,9 @@ steps:
     args:
       - '-c'
       - |
-        echo "Waiting for services to start..."
-        sleep 15
-        echo "Running tests..."
+        echo "Waiting for services to start...";
+        sleep 15;
+        echo "Running tests...";
         docker exec book-test-runner mvn test
 
 artifacts:
