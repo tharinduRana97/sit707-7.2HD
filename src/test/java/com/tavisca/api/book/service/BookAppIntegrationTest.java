@@ -23,23 +23,23 @@ public class BookAppIntegrationTest {
 
 	@BeforeEach
 	public void setUp() {
-		System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
-
-		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--headless=new");
-		options.addArguments("--no-sandbox");
-		options.addArguments("--disable-dev-shm-usage");
-
 		try {
+			ChromeOptions options = new ChromeOptions();
+			options.addArguments("--headless=new");
+			options.addArguments("--no-sandbox");
+			options.addArguments("--disable-dev-shm-usage");
+
+			// Connect to remote WebDriver (Docker container exposing Selenium on port 4444)
 			driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
+
+			wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+			System.out.println("Remote WebDriver initialized successfully.");
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-		System.out.println("CHROMEDRIVER PATH = " + System.getProperty("webdriver.chrome.driver"));
-
 	}
+
 
 	@AfterEach
 	public void tearDown() {
