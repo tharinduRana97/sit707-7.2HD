@@ -17,6 +17,7 @@ steps:
         && chromedriver --version \
         && google-chrome --version
 
+
   # Step 1: Clean and compile
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Compile'
