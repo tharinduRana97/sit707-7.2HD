@@ -1,16 +1,20 @@
 steps:
   - name: 'docker/compose:1.29.2'
-    args: ['up', '-d']  # Start containers in the background
+    args: ['up', '-d']
 
   - name: 'docker/compose:1.29.2'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "Waiting for services to start...";
-        sleep 15;
-        echo "Running tests...";
-        docker exec book-test-runner mvn test
+        echo "Waiting for services to start..."
+        sleep 15
+        echo "Running tests..."
+        docker exec book-test-runner mvn -Dmaven.repo.local=/cache/.m2 test
+
+volumes:
+  - name: 'm2-cache'
+    path: /cache/.m2
 
 artifacts:
   objects:
