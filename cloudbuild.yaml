@@ -1,13 +1,32 @@
 steps:
-  # Step 1: Clean and compile the project
+  # Step 0: Install Chrome + ChromeDriver + Xvfb
+  - name: 'ubuntu'
+    id: 'Install Chrome & ChromeDriver'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        apt-get update && apt-get install -y wget unzip gnupg curl xvfb \
+        && curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-linux.gpg \
+        && echo "deb [signed-by=/usr/share/keyrings/google-linux.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+        && apt-get update && apt-get install -y google-chrome-stable \
+        && curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE > VERSION \
+        && wget https://chromedriver.storage.googleapis.com/$(cat VERSION)/chromedriver_linux64.zip \
+        && unzip chromedriver_linux64.zip && mv chromedriver /usr/bin/chromedriver && chmod +x /usr/bin/chromedriver
+
+  # Step 1: Clean and compile
   - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Clean and Build'
+    id: 'Clean and Compile'
     args: ['clean', 'compile']
 
-  # Step 2: Run tests (expect failures in early runs)
+  # Step 2: Run tests with Xvfb + ChromeDriver
   - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Run Tests'
-    args: ['test']
+    id: 'Run Tests with Selenium'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        Xvfb :99 & export DISPLAY=:99 && mvn test
 
   # Step 3: Package the application
   - name: 'gcr.io/cloud-builders/mvn'
@@ -24,8 +43,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 artifacts:
-  # Optionally store build artifacts
   objects:
-    location: 'gs://your-bucket-name/build-artifacts/'
+    location: 'gs://s224169428/sit707/'
     paths: ['target/*.jar']
 
