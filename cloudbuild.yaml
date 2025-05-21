@@ -1,46 +1,29 @@
 steps:
+  # Pull Maven cache
   - name: 'gcr.io/cloud-builders/gsutil'
-    entrypoint: 'bash'
+    entrypoint: 'sh'
     args:
       - '-c'
       - |
         echo "Pulling Maven cache..."
         gsutil -m cp -r gs://s224169428/maven_cache/.m2 /workspace/ || echo "No existing cache."
 
+  # Build and start all services (app & selenium)
   - name: 'docker/compose:1.29.2'
-    args: ['up', '-d']
+    args: ['up', '-d', '--build']
 
+  # Run integration tests after app and selenium are running
   - name: 'docker/compose:1.29.2'
-    entrypoint: 'bash'
     args:
-      - '-c'
-      - |
-        echo "Waiting for Selenium to be ready..."
-        for i in {1..30}; do
-          if docker exec book-test-runner curl -s http://selenium:4444/wd/hub/status | grep -q '"ready":true'; then
-            echo "Selenium is ready!"
-            break
-          fi
-          echo "Waiting for Selenium... attempt $i"
-          sleep 2
-        done
+      - 'run'
+      - '--rm'
+      - '-e'
+      - 'MAVEN_CONFIG=/workspace/.m2'
+      - 'book-test-runner'
+      - 'mvn'
+      - 'test'
 
-        echo "Starting Spring Boot application..."
-        docker exec -d book-test-runner mvn spring-boot:run
-
-        echo "Waiting for Spring Boot to become healthy..."
-        for i in {1..30}; do
-          if docker exec book-test-runner curl -s http://localhost:8080/actuator/health | grep -q '"status":"UP"'; then
-            echo "Application is UP!"
-            break
-          fi
-          echo "Waiting for app... attempt $i"
-          sleep 2
-        done
-
-        echo "Running integration tests..."
-        docker exec book-test-runner mvn test -Dmaven.repo.local=/workspace/.m2
-
+  # Save Maven cache
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/maven_cache/']
 

@@ -7,3 +7,6 @@ RUN apt-get update && apt-get install -y \
 	
 WORKDIR /app
 COPY . .
+
+# Start the app when container runs
+CMD ["mvn", "spring-boot:run"]
