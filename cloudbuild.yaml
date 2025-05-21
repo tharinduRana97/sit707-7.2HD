@@ -15,7 +15,8 @@ steps:
     id: 'Package App'
     args: ['mvn', 'package']
 
-logsBucket: 'gs://s224169428-cloudbuild-logs/'
+options:
+  logging: CLOUD_LOGGING_ONLY
 artifacts:
   objects:
     location: 'gs://s224169428/sit707/'
