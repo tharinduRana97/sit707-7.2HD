@@ -1,6 +1,7 @@
 steps:
   - name: 'docker/compose:1.29.2'
     args: ['up', '-d']
+    dir: '.' 
 
   - name: 'docker/compose:1.29.2'
     entrypoint: 'bash'
