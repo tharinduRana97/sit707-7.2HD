@@ -1,33 +1,21 @@
 steps:
-  # Step 1: Start Selenium Standalone Chrome (Dockerized)
   - name: 'gcr.io/cloud-builders/docker'
-    id: 'Start Selenium Chrome'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        docker run -d -p 4444:4444 --shm-size=2g --name selenium selenium/standalone-chrome
-        sleep 10  # Give time for Selenium server to start
+    id: 'Build Test Image'
+    args: ['build', '-f', 'Dockerfile.test', '-t', 'gcr.io/$PROJECT_ID/book-test-image', '.']
 
-  # Step 2: Run Tests using RemoteWebDriver
-  - name: 'gcr.io/cloud-builders/mvn'
+  - name: 'gcr.io/$PROJECT_ID/book-test-image'
     id: 'Run Tests'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "Running Selenium tests using RemoteWebDriver..."
-        mvn test
+        Xvfb :99 & sleep 2 && mvn clean test
 
-  # Step 3: Package application
-  - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Package'
-    args: ['package']
+  - name: 'gcr.io/$PROJECT_ID/book-test-image'
+    id: 'Package App'
+    args: ['mvn', 'package']
 
 artifacts:
   objects:
     location: 'gs://s224169428/sit707/'
     paths: ['target/*.jar']
-
-options:
-  logging: CLOUD_LOGGING_ONLY
