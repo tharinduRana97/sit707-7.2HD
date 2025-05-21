@@ -4,29 +4,21 @@ steps:
     args:
       - '-c'
       - |
-        echo "Attempting to pull Maven cache..."
-        gsutil -m cp -r gs://s224169428/maven_cache/.m2 /workspace/ || echo "No cache found. Proceeding..."
+        echo "Pulling Maven cache..."
+        gsutil -m cp -r gs://s224169428/maven_cache/.m2 /workspace/ || echo "No existing cache."
 
   - name: 'docker/compose:1.29.2'
     args: ['up', '-d']
 
-  - name: 'docker/compose:1.29.2'  # FIXED INDENTATION
-    entrypoint: 'bash'
+  - name: 'docker/compose:1.29.2'
     args:
-      - '-c'
-      - |
-        echo "Waiting for Selenium to be ready..."
-        for i in {1..30}; do
-          if docker exec book-test-runner curl -s http://selenium:4444/wd/hub/status | grep -q '"ready":true'; then
-            echo "Selenium is ready!"
-            break
-          fi
-          echo "Waiting for Selenium... attempt $i"
-          sleep 2
-        done
-
-        echo "Running tests..."
-        docker exec book-test-runner mvn -Dmaven.repo.local=/workspace/.m2 test
+      - 'run'
+      - '--rm'
+      - '-e'
+      - 'MAVEN_CONFIG=/workspace/.m2'
+      - 'book-test-runner'
+      - 'mvn'
+      - 'test'
 
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/maven_cache/']
