@@ -1,0 +1,15 @@
+com/tavisca/api/book/exception/InvalidBorrowRequestException.class
+com/tavisca/api/book/POJO/ApiResponseSuccess.class
+com/tavisca/api/book/constants/BookGenre.class
+com/tavisca/api/book/constants/BookErrors.class
+com/tavisca/api/book/POJO/Book.class
+com/tavisca/api/book/POJO/ApiResponse.class
+com/tavisca/api/book/BookAppApplication.class
+com/tavisca/api/book/exception/ExceptionHandlerController.class
+com/tavisca/api/book/controller/BookController.class
+com/tavisca/api/book/controller/HomeController.class
+com/tavisca/api/book/POJO/ApiResponseError.class
+com/tavisca/api/book/constants/BookTags.class
+com/tavisca/api/book/POJO/BorrowRequest.class
+com/tavisca/api/book/service/BookService.class
+com/tavisca/api/book/controller/BookWebController.class

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book Info</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('/images/info-bg.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+
+        .overlay {
+            background-color: rgba(255, 255, 255, 0.3);
+            min-height: 100vh;
+            padding: 60px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 500px;
+            background-color: #ffffff;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        label {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #333;
+            text-align: left;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .info {
+            margin-top: 30px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .info p {
+            margin: 8px 0;
+        }
+
+        .error {
+            color: red;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <div class="container">
+            <h1>Book Information</h1>
+            <form th:action="@{/info}" method="get">
+                <label>Book ID:</label>
+                <input type="number" name="bookId"/>
+                <button type="submit">Get Info</button>
+            </form>
+
+            <div th:if="${book}" class="info">
+                <p><strong>Title:</strong> <span th:text="${book.title}"></span></p>
+                <p><strong>Author:</strong> <span th:text="${book.author}"></span></p>
+                <p><strong>Status:</strong> <span th:text="${book.borrowed} ? 'Borrowed' : 'Available'"></span></p>
+            </div>
+
+            <div th:if="${error}" class="error">
+                <p th:text="${error}"></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
