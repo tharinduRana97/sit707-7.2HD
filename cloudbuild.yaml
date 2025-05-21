@@ -15,10 +15,15 @@ steps:
     args:
       - '-c'
       - |
-        echo "Waiting for services to start...";
-        sleep 15;
-        echo "Running tests...";
+        echo "Waiting for book-test-runner to be ready..."
+        for i in {1..30}; do
+          docker exec book-test-runner curl -s http://localhost:8080/health && break
+          echo "Still waiting... $i"
+          sleep 2
+        done
+        echo "Running tests..."
         docker exec book-test-runner mvn -Dmaven.repo.local=/workspace/.m2 test
+
 
   - name: 'gcr.io/cloud-builders/gsutil'
     args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/maven_cache/']
