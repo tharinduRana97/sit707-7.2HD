@@ -18,7 +18,7 @@ public class BookAppIntegrationTest {
 
 	private WebDriver driver;
 	private WebDriverWait wait;
-	private static final String BASE_URL = "http://localhost:8080";
+	private static final String BASE_URL = "http://book-test-runner:8080";
 
 	@BeforeEach
 	public void setUp() {
@@ -26,7 +26,7 @@ public class BookAppIntegrationTest {
 	    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
 
 	    try {
-	        driver = new RemoteWebDriver(new URL(System.getenv("SELENIUM_REMOTE_URL")), options);
+	    	driver = new RemoteWebDriver(new URL(System.getenv("SELENIUM_REMOTE_URL")), options);
 	    } catch (MalformedURLException e) {
 	        e.printStackTrace();
 	    }

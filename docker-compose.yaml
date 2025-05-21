@@ -20,6 +20,6 @@ services:
       selenium:
         condition: service_healthy
     environment:
-      - SELENIUM_REMOTE_URL=http://book-test-runner:8080
+      - SELENIUM_REMOTE_URL=http://selenium:4444/wd/hub
     ports:
       - "8080:8080" 
