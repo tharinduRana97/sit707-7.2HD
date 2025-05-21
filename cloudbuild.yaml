@@ -1,7 +1,7 @@
 steps:
   # Step 0: Install Chrome + ChromeDriver + Xvfb
-  - name: 'ubuntu'
-    id: 'Install Chrome & ChromeDriver'
+    - name: 'ubuntu'
+    id: 'Install Chrome & Compatible ChromeDriver'
     entrypoint: 'bash'
     args:
       - '-c'
@@ -10,8 +10,9 @@ steps:
         && curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-linux.gpg \
         && echo "deb [signed-by=/usr/share/keyrings/google-linux.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
         && apt-get update && apt-get install -y google-chrome-stable \
-        && curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE > VERSION \
-        && wget https://chromedriver.storage.googleapis.com/$(cat VERSION)/chromedriver_linux64.zip \
+        && CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+') \
+        && CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}") \
+        && wget https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip \
         && unzip chromedriver_linux64.zip && mv chromedriver /usr/bin/chromedriver && chmod +x /usr/bin/chromedriver
 
   # Step 1: Clean and compile
