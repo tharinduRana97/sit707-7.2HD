@@ -1,16 +1,26 @@
 steps:
+  # Step 1: Download Maven cache from Cloud Storage (if available)
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: ['-m', 'cp', '-r', 'gs://s224169428/maven_cache/.m2', '/workspace/']
+
+  # Step 2: Start containers
   - name: 'docker/compose:1.29.2'
     args: ['up', '-d']
 
+  # Step 3: Wait and run tests
   - name: 'docker/compose:1.29.2'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        echo "Waiting for services to start..."
-        sleep 15
-        echo "Running tests..."
+        echo "Waiting for services to start...";
+        sleep 15;
+        echo "Running tests...";
         docker exec book-test-runner mvn -Dmaven.repo.local=/workspace/.m2 test
+
+  # Step 4: Save updated Maven cache to Cloud Storage
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/maven_cache/']
 
 artifacts:
   objects:
@@ -19,7 +29,3 @@ artifacts:
 
 options:
   logging: CLOUD_LOGGING_ONLY
-
-cache:
-  paths:
-    - '.m2/repository'
