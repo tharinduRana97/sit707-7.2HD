@@ -19,3 +19,5 @@ artifacts:
   objects:
     location: 'gs://s224169428/sit707/'
     paths: ['target/*.jar']
+
+    
