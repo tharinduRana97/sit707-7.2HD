@@ -1,5 +1,4 @@
 steps:
-  # Step 0: Install Chrome and matching ChromeDriver from official source
   - name: 'ubuntu'
     id: 'Install Chrome & ChromeDriver'
     entrypoint: 'bash'
@@ -7,37 +6,35 @@ steps:
       - '-c'
       - |
         apt-get update -y && apt-get install -y \
-        wget unzip curl gnupg software-properties-common fonts-liberation \
-        libasound2t64 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 \
-        libcups2 libdbus-1-3 libdrm2 libgbm1 libgtk-4-1 libnspr4 libnss3 \
-        libu2f-udev libvulkan1 libxcomposite1 libxdamage1 libxfixes3 \
-        libxkbcommon0 libxrandr2 xdg-utils xvfb
+        wget unzip curl gnupg file ldd xvfb \
+        libgtk-3-0 libnss3 libxss1 libasound2 libx11-xcb1 libdbus-1-3 libxcomposite1 libxdamage1 libxrandr2
 
-        # Download and install Chrome for Testing (official build)
+        # Install Chrome
         wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/121.0.6167.85/linux64/chrome-linux64.zip
         unzip chrome-linux64.zip
         rm chrome-linux64.zip
         mv chrome-linux64 /opt/chrome
-        ln -s /opt/chrome/chrome /usr/local/bin/google-chrome
+        ln -s /opt/chrome/chrome /usr/bin/google-chrome
 
-        # Download and install matching Chromedriver (official build)
+        # Install Chromedriver
         wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/121.0.6167.85/linux64/chromedriver-linux64.zip
         unzip -j chromedriver-linux64.zip chromedriver-linux64/chromedriver
         rm chromedriver-linux64.zip
         mv chromedriver /usr/bin/chromedriver
         chmod +x /usr/bin/chromedriver
 
-        # Confirm they are usable
-        file /usr/bin/chromedriver
+        # Sanity check
+        echo "== Chrome Version =="
         google-chrome --version
+        echo "== Chromedriver Info =="
+        file /usr/bin/chromedriver
+        ldd /usr/bin/chromedriver || echo "ldd failed"
         chromedriver --version
 
-  # Step 1: Compile the project
-  # - name: 'gcr.io/cloud-builders/mvn'
-  #   id: 'Compile'
-  #   args: ['clean', 'compile']
+  - name: 'gcr.io/cloud-builders/mvn'
+    id: 'Compile'
+    args: ['clean', 'compile']
 
-  # Step 2: Run Selenium tests with headless X display
   - name: 'gcr.io/cloud-builders/mvn'
     id: 'Run Tests'
     entrypoint: 'bash'
@@ -45,12 +42,11 @@ steps:
       - '-c'
       - |
         Xvfb :99 & export DISPLAY=:99
-        echo "Running tests with DISPLAY=$$DISPLAY"
+        echo "Running tests in headless mode with DISPLAY=$$DISPLAY"
         mvn test
 
-  # Step 3: Package the application
   - name: 'gcr.io/cloud-builders/mvn'
-    id: 'Package App'
+    id: 'Package'
     args: ['package']
 
 artifacts:
