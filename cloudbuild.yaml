@@ -60,6 +60,9 @@ steps:
       - '--region=us-central1'
       - '--allow-unauthenticated'
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 artifacts:
   objects:
     location: 'gs://s224169428/sit707/'
