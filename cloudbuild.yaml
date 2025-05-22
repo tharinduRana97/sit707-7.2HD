@@ -4,12 +4,18 @@ steps:
     name: 'gcr.io/cloud-builders/mvn'
     args: ['compile']
 
-  # Run unit and integration tests
+  - id: 'Setup test Env'
+    name: 'docker/compose:1.29.2'
+    args: ['up', '-d', '--build']
+
+  # Run integration tests
   - id: 'Tests'
     name: 'docker/compose:1.29.2'
     args:
       - 'run'
       - '--rm'
+      - '-e'
+      - 'MAVEN_CONFIG=/workspace/.m2'
       - 'book-test-runner'
       - 'mvn'
       - 'test'
