@@ -19,31 +19,31 @@ public class BookAppIntegrationTest {
 
 	private WebDriver driver;
 	private WebDriverWait wait;
-//	private static final String BASE_URL = "http://book-test-runner:8080";
+	private static final String BASE_URL = "http://book-test-runner:8080";
 	
-	private static final String BASE_URL = "http://localhost:8080";
+//	private static final String BASE_URL = "http://localhost:8080";
 
-    @BeforeEach
-    public void setUp() {
-        System.setProperty("webdriver.chrome.driver", "/Users/tharinduranasinghe/chromedriver-mac-arm64/chromedriver");
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
-        driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    }
+//    @BeforeEach
+//    public void setUp() {
+//        System.setProperty("webdriver.chrome.driver", "/Users/tharinduranasinghe/chromedriver-mac-arm64/chromedriver");
+//        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
+//        driver = new ChromeDriver(options);
+//        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+//    }
 
-//	@BeforeEach
-//	public void setUp() {
-//	    ChromeOptions options = new ChromeOptions();
-//	    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
-//
-//	    try {
-//	    	driver = new RemoteWebDriver(new URL(System.getenv("SELENIUM_REMOTE_URL")), options);
-//	    } catch (MalformedURLException e) {
-//	        e.printStackTrace();
-//	    }
-//	    wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-//	}
+	@BeforeEach
+	public void setUp() {
+	    ChromeOptions options = new ChromeOptions();
+	    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
+
+	    try {
+	    	driver = new RemoteWebDriver(new URL(System.getenv("SELENIUM_REMOTE_URL")), options);
+	    } catch (MalformedURLException e) {
+	        e.printStackTrace();
+	    }
+	    wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+	}
 
 
 
