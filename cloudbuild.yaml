@@ -1,6 +1,7 @@
 steps:
   # Pull Maven cache
-  - name: 'gcr.io/cloud-builders/gsutil'
+  - id: 'pull maven cahche'
+    name: 'gcr.io/cloud-builders/gsutil'
     entrypoint: 'sh'
     args:
       - '-c'
@@ -8,48 +9,50 @@ steps:
         echo "Pulling Maven cache..."
         gsutil -m cp -r gs://s224169428/maven_cache/.m2 /workspace/ || echo "No existing cache."
 
+  - id: 'compile'
+    name: 'gcr.io/cloud-builders/mvn'
+    args: ['compile']
+
   # Start services and build images
-  # - name: 'docker/compose:1.29.2'
-  #   args: ['up', '-d', '--build']
+  - id: 'start application for test'
+    name: 'docker/compose:1.29.2'
+    args: ['up', '-d', '--build']
 
   # Run integration tests
-  # - name: 'docker/compose:1.29.2'
-  #   args:
-  #     - 'run'
-  #     - '--rm'
-  #     - '-e'
-  #     - 'MAVEN_CONFIG=/workspace/.m2'
-  #     - 'book-test-runner'
-  #     - 'mvn'
-  #     - 'test'
+  - id: 'Tests'
+    name: 'docker/compose:1.29.2'
+    args:
+      - 'run'
+      - '--rm'
+      - '-e'
+      - 'MAVEN_CONFIG=/workspace/.m2'
+      - 'book-test-runner'
+      - 'mvn'
+      - 'test'
 
   # Save Maven cache
-  # - name: 'gcr.io/cloud-builders/gsutil'
-  #   args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/sit707/maven_cache/']
-
-  # Clean existing target folder
-  - name: 'gcr.io/cloud-builders/mvn'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        echo "Cleaning up target directory..."
-        rm -rf target
+  - id: 'save cache'
+    name: 'gcr.io/cloud-builders/gsutil'
+    args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/sit707/maven_cache/']
 
   # Package JAR
-  - name: 'gcr.io/cloud-builders/mvn'
+  - id: 'Package'
+    name: 'gcr.io/cloud-builders/mvn'
     args: ['package', '-DskipTests=true']
 
   # Build Docker image
-  - name: 'gcr.io/cloud-builders/docker'
+  - id: 'Dockerize'
+    name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/book-app:latest', '.']
 
   # Push Docker image
-  - name: 'gcr.io/cloud-builders/docker'
+  - id: 'Push to repository'
+    name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/book-app:latest']
 
   # Deploy to Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  - id: 'Deploy'
+    name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
       - 'run'
