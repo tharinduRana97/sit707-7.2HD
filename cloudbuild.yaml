@@ -8,11 +8,11 @@ steps:
         echo "Pulling Maven cache..."
         gsutil -m cp -r gs://s224169428/maven_cache/.m2 /workspace/ || echo "No existing cache."
 
-  # Build and start all services (app & selenium)
+  # Start services and build images
   - name: 'docker/compose:1.29.2'
     args: ['up', '-d', '--build']
 
-  # Run integration tests after app and selenium are running
+  # Run integration tests
   - name: 'docker/compose:1.29.2'
     args:
       - 'run'
@@ -25,12 +25,42 @@ steps:
 
   # Save Maven cache
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/maven_cache/']
+    args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/sit707/maven_cache/']
+
+  # Clean existing target folder
+  - name: 'gcr.io/cloud-builders/mvn'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - |
+        echo "Cleaning up target directory..."
+        rm -rf target
+
+  # Package JAR
+  - name: 'gcr.io/cloud-builders/mvn'
+    args: ['package', '-DskipTests=true']
+
+  # Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/book-app:latest', '.']
+
+  # Push Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/book-app:latest']
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'book-app'
+      - '--image=gcr.io/$PROJECT_ID/book-app:latest'
+      - '--platform=managed'
+      - '--region=us-central1'
+      - '--allow-unauthenticated'
 
 artifacts:
   objects:
     location: 'gs://s224169428/sit707/'
     paths: ['target/*.jar']
-
-options:
-  logging: CLOUD_LOGGING_ONLY
