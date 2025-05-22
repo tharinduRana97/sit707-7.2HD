@@ -1,22 +1,8 @@
 steps:
-  # Pull Maven cache
-  - id: 'pull maven cahche'
-    name: 'gcr.io/cloud-builders/gsutil'
-    entrypoint: 'sh'
-    args:
-      - '-c'
-      - |
-        echo "Pulling Maven cache..."
-        gsutil -m cp -r gs://s224169428/maven_cache/.m2 /workspace/ || echo "No existing cache."
-
-  - id: 'compile'
+  # Compile the code before testing
+  - id: 'Compile'
     name: 'gcr.io/cloud-builders/mvn'
     args: ['compile']
-
-  # Start services and build images
-  - id: 'start application for test'
-    name: 'docker/compose:1.29.2'
-    args: ['up', '-d', '--build']
 
   # Run integration tests
   - id: 'Tests'
@@ -24,16 +10,9 @@ steps:
     args:
       - 'run'
       - '--rm'
-      - '-e'
-      - 'MAVEN_CONFIG=/workspace/.m2'
       - 'book-test-runner'
       - 'mvn'
       - 'test'
-
-  # Save Maven cache
-  - id: 'save cache'
-    name: 'gcr.io/cloud-builders/gsutil'
-    args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/sit707/maven_cache/']
 
   # Package JAR
   - id: 'Package'
@@ -46,7 +25,7 @@ steps:
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/book-app:latest', '.']
 
   # Push Docker image
-  - id: 'Push to repository'
+  - id: 'Push to Repository'
     name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/book-app:latest']
 
@@ -62,7 +41,7 @@ steps:
       - '--platform=managed'
       - '--region=us-central1'
       - '--allow-unauthenticated'
-      
+
 options:
   logging: CLOUD_LOGGING_ONLY
 
