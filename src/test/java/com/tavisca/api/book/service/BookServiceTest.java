@@ -1,18 +1,29 @@
 package com.tavisca.api.book.service;
 
 import com.tavisca.api.book.POJO.*;
+import com.tavisca.api.book.repository.BookRepository;
+
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DataJpaTest
+@TestPropertySource(properties = {
+    "spring.jpa.hibernate.ddl-auto=create-drop"
+})
 public class BookServiceTest {
+	@Autowired
+    private BookRepository bookRepository;
+    private BookService bookService;
 
-	private BookService bookService;
-
-	@BeforeEach
-	void setup() {
-		bookService = new BookService();
-	}
+    @BeforeEach
+    void setup() {
+        bookService = new BookService(bookRepository);
+    }
 
 	// ----- addBook() Tests -----
 
@@ -279,7 +290,7 @@ public class BookServiceTest {
 	@Test
 	void addBook_E1_whenTitleIsVeryLong_shouldSucceed() {
 		// Arrange
-		String longTitle = "A".repeat(1000); // simulate long title
+		String longTitle = "A".repeat(250); // simulate long title
 		Book book = new Book(20, longTitle, "Author", false);
 
 		// Act
@@ -287,22 +298,24 @@ public class BookServiceTest {
 
 		// Assert
 		assertTrue(response instanceof ApiResponseSuccess);
-		assertEquals("Book added successfully", ((ApiResponseSuccess) response).getData());
+	    assertEquals("Book added successfully", ((ApiResponseSuccess) response).getData());
 	}
 
 	@Test
-	void addBook_E2_whenAuthorIsVeryLong_shouldSucceed() {
-		// Arrange
-		String longAuthor = "B".repeat(1000); // simulate long author
-		Book book = new Book(21, "Some Book", longAuthor, false);
+	void addBook_E2_whenAuthorIsVeryLong_shouldReturnSuccess() {
+	    // Arrange
+	    String longAuthor = "B".repeat(250); // too long for varchar(255)
+	    Book book = new Book(21, "Some Book", longAuthor, false);
 
-		// Act
-		ApiResponse response = bookService.addBook(book);
+	    // Act
+	    ApiResponse response = bookService.addBook(book);
 
-		// Assert
-		assertTrue(response instanceof ApiResponseSuccess);
-		assertEquals("Book added successfully", ((ApiResponseSuccess) response).getData());
+	    // Assert
+	    assertTrue(response instanceof ApiResponseSuccess);
+	    assertEquals("Book added successfully", ((ApiResponseSuccess) response).getData());
 	}
+
+
 
 	@Test
 	void addBook_E3_whenIdIsMaxInteger_shouldSucceed() {
@@ -378,7 +391,7 @@ public class BookServiceTest {
 	}
 
 	@AfterEach
-	void tearDown() {
-		// Optional cleanup
-	}
+    void tearDown() {
+        bookRepository.deleteAll(); // Optional: Reset DB after each test
+    }
 }

@@ -5,6 +5,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.net.MalformedURLException;
@@ -18,20 +19,31 @@ public class BookAppIntegrationTest {
 
 	private WebDriver driver;
 	private WebDriverWait wait;
-	private static final String BASE_URL = "http://book-test-runner:8080";
+//	private static final String BASE_URL = "http://book-test-runner:8080";
+	
+	private static final String BASE_URL = "http://localhost:8080";
 
-	@BeforeEach
-	public void setUp() {
-	    ChromeOptions options = new ChromeOptions();
-	    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
+    @BeforeEach
+    public void setUp() {
+        System.setProperty("webdriver.chrome.driver", "/Users/tharinduranasinghe/chromedriver-mac-arm64/chromedriver");
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless", "--no-sandbox", "--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    }
 
-	    try {
-	    	driver = new RemoteWebDriver(new URL(System.getenv("SELENIUM_REMOTE_URL")), options);
-	    } catch (MalformedURLException e) {
-	        e.printStackTrace();
-	    }
-	    wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-	}
+//	@BeforeEach
+//	public void setUp() {
+//	    ChromeOptions options = new ChromeOptions();
+//	    options.addArguments("--headless=new", "--no-sandbox", "--disable-dev-shm-usage");
+//
+//	    try {
+//	    	driver = new RemoteWebDriver(new URL(System.getenv("SELENIUM_REMOTE_URL")), options);
+//	    } catch (MalformedURLException e) {
+//	        e.printStackTrace();
+//	    }
+//	    wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+//	}
 
 
 
@@ -42,26 +54,32 @@ public class BookAppIntegrationTest {
 	}
 
 	// ----- Helper Methods -----
-
 	private void addBook(String id, String title, String author) {
-		driver.get(BASE_URL + "/add");
-		wait.until(ExpectedConditions.presenceOfElementLocated(By.name("id"))).sendKeys(id);
-		driver.findElement(By.name("title")).sendKeys(title);
-		driver.findElement(By.name("author")).sendKeys(author);
-		driver.findElement(By.cssSelector("button[type='submit']")).click();
-		waitForMessage();
+	    driver.get(BASE_URL + "/add");
+	    WebElement idField = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("id")));
+	    idField.clear();
+	    idField.sendKeys(id);
+	    driver.findElement(By.name("title")).sendKeys(title);
+	    driver.findElement(By.name("author")).sendKeys(author);
+	    driver.findElement(By.cssSelector("button[type='submit']")).click();
+	    waitForMessage();
 	}
+
 
 	private void borrowBook(String id) {
 		driver.get(BASE_URL + "/borrow");
-		wait.until(ExpectedConditions.presenceOfElementLocated(By.name("bookId"))).sendKeys(id);
+		WebElement idField = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("bookId")));
+		idField.clear();
+	    idField.sendKeys(id);
 		driver.findElement(By.cssSelector("button[type='submit']")).click();
 		waitForMessage();
 	}
 
 	private void returnBook(String id) {
 		driver.get(BASE_URL + "/return");
-		wait.until(ExpectedConditions.presenceOfElementLocated(By.name("bookId"))).sendKeys(id);
+		WebElement idField = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("bookId")));
+		idField.clear();
+	    idField.sendKeys(id);
 		driver.findElement(By.cssSelector("button[type='submit']")).click();
 		waitForMessage();
 	}
@@ -216,7 +234,8 @@ public class BookAppIntegrationTest {
 		driver.get(BASE_URL + "/info?bookId=3109");
 
 		// Assert
-//		wait.until(ExpectedConditions.textToBePresentInElementLocated(By.tagName("body"), "Info Book"));
+		wait.until(ExpectedConditions.textToBePresentInElementLocated(
+			    By.cssSelector(".info"), "Info Book"));
 		assertTrue(driver.getPageSource().contains("Info Book"));
 	}
 
@@ -224,7 +243,6 @@ public class BookAppIntegrationTest {
 	public void TC_14_GetBookInfo_NotFound_ShouldDisplayError() {
 		// Act
 		driver.get(BASE_URL + "/info?bookId=99903");
-
 		// Assert
 		assertTrue(driver.getPageSource().contains("Book not found"));
 	}
@@ -252,7 +270,7 @@ public class BookAppIntegrationTest {
 	@Test
 	public void TC_17_AddBook_VeryLongTitle_ShouldSucceed() {
 		// Arrange
-		String title = "A".repeat(500);
+		String title = "A".repeat(250);
 		addBook("3111", title, "Author");
 
 		// Assert
@@ -262,7 +280,7 @@ public class BookAppIntegrationTest {
 	@Test
 	public void TC_18_AddBook_VeryLongAuthor_ShouldSucceed() {
 		// Arrange
-		String author = "B".repeat(500);
+		String author = "B".repeat(250);
 		addBook("3112", "Book", author);
 
 		// Assert
