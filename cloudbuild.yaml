@@ -4,7 +4,7 @@ steps:
     name: 'gcr.io/cloud-builders/mvn'
     args: ['compile']
 
-  # Run integration tests
+  # Run unit and integration tests
   - id: 'Tests'
     name: 'docker/compose:1.29.2'
     args:
