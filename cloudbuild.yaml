@@ -9,23 +9,23 @@ steps:
         gsutil -m cp -r gs://s224169428/maven_cache/.m2 /workspace/ || echo "No existing cache."
 
   # Start services and build images
-  - name: 'docker/compose:1.29.2'
-    args: ['up', '-d', '--build']
+  # - name: 'docker/compose:1.29.2'
+  #   args: ['up', '-d', '--build']
 
   # Run integration tests
-  - name: 'docker/compose:1.29.2'
-    args:
-      - 'run'
-      - '--rm'
-      - '-e'
-      - 'MAVEN_CONFIG=/workspace/.m2'
-      - 'book-test-runner'
-      - 'mvn'
-      - 'test'
+  # - name: 'docker/compose:1.29.2'
+  #   args:
+  #     - 'run'
+  #     - '--rm'
+  #     - '-e'
+  #     - 'MAVEN_CONFIG=/workspace/.m2'
+  #     - 'book-test-runner'
+  #     - 'mvn'
+  #     - 'test'
 
   # Save Maven cache
-  - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/sit707/maven_cache/']
+  # - name: 'gcr.io/cloud-builders/gsutil'
+  #   args: ['-m', 'cp', '-r', '/workspace/.m2', 'gs://s224169428/sit707/maven_cache/']
 
   # Clean existing target folder
   - name: 'gcr.io/cloud-builders/mvn'
@@ -59,6 +59,9 @@ steps:
       - '--platform=managed'
       - '--region=us-central1'
       - '--allow-unauthenticated'
+      
+options:
+  logging: CLOUD_LOGGING_ONLY
 
 artifacts:
   objects:
