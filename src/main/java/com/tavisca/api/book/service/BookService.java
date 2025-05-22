@@ -23,7 +23,7 @@ public class BookService {
         if (book == null) return new ApiResponseError("Book cannot be null");
         if (book.getId() <= 0) return new ApiResponseError("Invalid book ID");
         if (bookRepository.existsById(book.getId())) return new ApiResponseError("Book with this ID already exists");
-        if (isNullOrBlank(book.getTitle()))
+        if (isNullOrBlank(book.getTitle()) || isNullOrBlank(book.getAuthor()))
             return new ApiResponseError("Title and author must not be empty");
 
         bookRepository.save(book);
